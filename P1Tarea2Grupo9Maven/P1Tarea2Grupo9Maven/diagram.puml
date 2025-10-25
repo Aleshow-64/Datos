@@ -1,0 +1,196 @@
+@startuml CatalogoPeliculas
+
+' Configuración de estilo general
+skinparam backgroundColor #F5F5F5
+skinparam classBackgroundColor #FFFFFF
+skinparam classBorderColor #2C3E50
+skinparam classBorderThickness 2
+skinparam arrowColor #34495E
+skinparam arrowThickness 1.5
+skinparam packageBackgroundColor #FAFAFA
+skinparam packageBorderColor #2C3E50
+skinparam packageBorderThickness 2.5
+skinparam stereotypeCBackgroundColor #3498DB
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam packageStyle rectangle
+skinparam nodesep 60
+skinparam ranksep 80
+skinparam defaultFontSize 12
+skinparam defaultFontName Arial
+
+package "MODELO" #E8F5E9 {
+    
+    class LinkedList <<Lista Enlazada>> {
+        - head : Node
+        ..
+        + LinkedList()
+        + isEmpty() : boolean
+        + getSize() : int
+        + insertAtBeginning(movie : Movie)
+        + insertAtEnd(movie : Movie)
+        + deleteByTitle(title : String) : boolean
+        + findByTitle(title : String) : Movie
+        + getAllMovies() : Movie[]
+    }
+    
+    class Node <<Nodo>> {
+        - data : Movie
+        - next : Node
+        ..
+        + Node(data : Movie)
+        + getData() : Movie
+        + setData(data : Movie)
+        + getNext() : Node
+        + setNext(next : Node)
+    }
+    
+    class Movie <<Entidad>> {
+        - title : String
+        - director : String
+        - year : int
+        - genre : String
+        - synopsis : String
+        ..
+        + Movie(...)
+        + getters/setters
+        + toString() : String
+    }
+}
+
+package "VISTA" #E3F2FD {
+    
+    class MainWindow <<Ventana Principal>> {
+        - contentPane : JPanel
+        + formPanel : FormPanel
+        + listPanel : ListPanel
+        ..
+        + MainWindow()
+    }
+    
+    class FormPanel <<Panel Formulario>> {
+        + txtTitle, txtDirector : JTextField
+        + txtYear, txtGenre : JTextField
+        + txtSynopsis : JTextArea
+        + cmbInsertPosition : JComboBox
+        ..
+        + btnSave : JButton
+        + btnNew : JButton
+        + btnDelete : JButton
+        + btnMoveToBeginning : JButton
+        + btnMoveToEnd : JButton
+        ..
+        + FormPanel()
+    }
+    
+    class ListPanel <<Panel Lista>> {
+        + movieTable : JTable
+        + tableModel : DefaultTableModel
+        + sorter : TableRowSorter
+        + txtSearch : JTextField
+        + cmbSearchBy : JComboBox
+        ..
+        + ListPanel()
+        + filterTable(query, column)
+    }
+}
+
+package "CONTROLADOR" #FFF9C4 {
+    
+    class MovieController <<Controlador>> {
+        - view : MainWindow
+        - model : LinkedList
+        ..
+        + MovieController(view, model)
+        ..
+        ' Listeners
+        + actionPerformed(e)
+        + valueChanged(e)
+        + insertUpdate(e)
+        + removeUpdate(e)
+        + changedUpdate(e)
+        ..
+        ' Lógica de Negocio
+        - saveMovie()
+        - deleteMovie()
+        - moveToBeginning()
+        - moveToEnd()
+        - updateTable()
+        - clearForm()
+        - fillForm(movie)
+        - filter()
+    }
+}
+
+package "APLICACIÓN" #FFE0E0 {
+    
+    class Main <<Punto de Entrada>> {
+        + {static} main(args[])
+    }
+}
+
+' ═══════════════════════════════════════
+'           RELACIONES ENTRE CLASES
+' ═══════════════════════════════════════
+
+LinkedList "1" o-- "0..*" Node : < contiene
+Node "1" *-- "1" Movie : < almacena
+
+MainWindow "1" *-- "1" FormPanel : < contiene
+MainWindow "1" *-- "1" ListPanel : < contiene
+
+MovieController "1" --> "1" MainWindow : < controla
+MovieController "1" --> "1" LinkedList : < gestiona
+
+Main ..> MainWindow : crea >
+Main ..> LinkedList : crea >
+Main ..> MovieController : crea >
+
+' ═══════════════════════════════════════
+'              NOTAS EXPLICATIVAS
+' ═══════════════════════════════════════
+
+note right of LinkedList #FFFACD
+  <b>📊 LISTA ENLAZADA SIMPLE</b>
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • Sin variable "size"
+  • Tamaño calculado dinámicamente
+  • Inserción O(1) al inicio
+  • Búsqueda secuencial O(n)
+end note
+
+note top of MovieController #E1F5FE
+  <b>🎮 CONTROLADOR MVC</b>
+  ━━━━━━━━━━━━━━━━━━━━━
+  <b>Interfaces:</b>
+  • ActionListener
+  • ListSelectionListener  
+  • DocumentListener
+  
+  <b>Operaciones:</b>
+  • CRUD completo
+  • Mover elementos (inicio/final)
+  • Búsqueda y filtrado
+end note
+
+note bottom of FormPanel #FFE4E1
+  <b>📝 FORMULARIO</b>
+  ━━━━━━━━━━━━━━━━━
+  • 5 campos de entrada
+  • Selector de posición
+  • 5 botones de acción
+  • Validación de datos
+end note
+
+note as N1 #E8F5E9
+  <b>🏗️ PATRÓN ARQUITECTÓNICO</b>
+  ━━━━━━━━━━━━━━━━━━━━━━━━━
+  <b>Modelo-Vista-Controlador (MVC)</b>
+  
+  ✓ Separación de responsabilidades
+  ✓ Modelo independiente de la UI
+  ✓ Fácil mantenimiento y escalabilidad
+end note
+
+@enduml
