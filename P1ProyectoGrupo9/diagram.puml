@@ -1,0 +1,170 @@
+@startuml CatalogoPeliculas
+
+' Configuración compacta
+skinparam backgroundColor #FFFFFF
+skinparam classBackgroundColor #FAFAFA
+skinparam classBorderColor #2C3E50
+skinparam packageBackgroundColor #F5F5F5
+skinparam packageBorderColor #34495E
+skinparam arrowColor #34495E
+skinparam shadowing false
+skinparam roundcorner 5
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 50
+
+' ═══════════════════════════════════════
+'                  MODELO
+' ═══════════════════════════════════════
+
+package "Modelo" #E8F5E9 {
+    class Pelicula {
+        - titulo : String
+        - director : String
+        - anio : int
+        - genero : String
+        - sinopsis : String
+        + getters/setters
+    }
+    
+    class Nodo {
+        - dato : Pelicula
+        - siguiente : Nodo
+    }
+    
+    class ListaEnlazada {
+        - cabeza : Nodo
+        + insertarAlInicio()
+        + insertarAlFinal()
+        + eliminarPorTitulo()
+        + buscarPorTitulo()
+        + obtenerTodasLasPeliculas()
+    }
+    
+    class Pila {
+        - lista : ListaEnlazada
+        + apilar()
+        + desapilar()
+        + verTope()
+    }
+    
+    class Cola {
+        - lista : ListaEnlazada
+        + encolar()
+        + desencolar()
+        + verFrente()
+    }
+}
+
+' ═══════════════════════════════════════
+'                  VISTA
+' ═══════════════════════════════════════
+
+package "Vista" #E3F2FD {
+    class VentanaPrincipal {
+        + panelFormulario
+        + panelLista
+        + panelEstado
+    }
+    
+    class PanelFormulario {
+        + campos de texto
+        + botones de acción
+    }
+    
+    class PanelLista {
+        + tablaPeliculas
+        + búsqueda y filtrado
+    }
+    
+    class PanelEstado {
+        + contadores
+        + log de operaciones
+    }
+    
+    class DialogoDemoEstructuras {
+        + demo Lista/Pila/Cola
+    }
+}
+
+' ═══════════════════════════════════════
+'               CONTROLADOR
+' ═══════════════════════════════════════
+
+package "Controlador" #FFF9C4 {
+    class ControladorPelicula {
+        - vista
+        - modelo
+        - pila
+        - cola
+        + CRUD películas
+        + gestión 3 estructuras
+    }
+}
+
+' ═══════════════════════════════════════
+'                   APP
+' ═══════════════════════════════════════
+
+class Main #FFE0E0 {
+    + main()
+}
+
+' ═══════════════════════════════════════
+'               RELACIONES
+' ═══════════════════════════════════════
+
+' Modelo
+ListaEnlazada "1" o-- "0..*" Nodo
+Nodo "1" *-- "1" Pelicula
+Pila "1" *-- "1" ListaEnlazada
+Cola "1" *-- "1" ListaEnlazada
+
+' Vista
+VentanaPrincipal *-- PanelFormulario
+VentanaPrincipal *-- PanelLista
+VentanaPrincipal *-- PanelEstado
+
+' Controlador
+ControladorPelicula --> VentanaPrincipal
+ControladorPelicula --> ListaEnlazada
+ControladorPelicula --> Pila
+ControladorPelicula --> Cola
+ControladorPelicula ..> DialogoDemoEstructuras
+
+' Main
+Main ..> VentanaPrincipal
+Main ..> ListaEnlazada
+Main ..> Pila
+Main ..> Cola
+Main ..> ControladorPelicula
+
+' ═══════════════════════════════════════
+'                 NOTAS
+' ═══════════════════════════════════════
+
+note right of ListaEnlazada
+  <b>ListaEnlazada</b>
+  Base para Pila y Cola
+  CRUD completo
+end note
+
+note top of Pila
+  <b>Pila (LIFO)</b>
+  Historial de
+  películas vistas
+end note
+
+note bottom of Cola
+  <b>Cola (FIFO)</b>
+  Películas
+  por ver
+end note
+
+note as MVC
+  <b>Patrón MVC</b>
+  Modelo-Vista-Controlador
+  Separación de responsabilidades
+end note
+
+@enduml
